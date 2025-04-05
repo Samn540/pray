@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Envía tu petición de oración y estaremos orando por ti y tu familia.">
+    <title>Orando por ti</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variables CSS */
+        :root {
+            --color-primary: #0b1584;
+            --color-secondary: #00a8ff;
+            --color-accent: #ff6b6b;
+            --color-light: #f8f9fa;
+            --color-dark: #212529;
+            --color-white: #ffffff;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        /* Reset y estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--color-light);
+            color: var(--color-dark);
+            line-height: 1.6;
+            padding-top: 100vh;
+        }
+
+        /* Animación parallax para el header */
+        @keyframes sticky-parallax-header-move-and-size {
+            from {
+                background-position: 50% 0;
+                height: 100vh;
+                font-size: calc(4vw + 1em);
+                background-color: rgba(11, 21, 132, 0.9);
+            }
+            to {
+                background-position: 50% 100%;
+                background-color: var(--color-primary);
+                height: 10vh;
+                font-size: 1.2em;
+            }
+        }
+
+        /* Header con efecto parallax */
+        #sticky-parallax-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--color-white);
+            text-align: center;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1509023464722-18d996393ca8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            z-index: 1000;
+            
+            animation: sticky-parallax-header-move-and-size linear forwards;
+            animation-timeline: scroll();
+            animation-range: 0vh 90vh;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            padding: 2rem;
+            transition: var(--transition);
+        }
+
+        .logo {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.5em;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Navbar que aparece después del scroll */
+        .navbar {
+            width: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem 5%;
+            background-color: var(--color-primary);
+        }
+
+        .navbar.active {
+            display: flex;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--color-white);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--color-secondary);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Contenido principal */
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            padding: 5rem 10%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            margin-bottom: 2rem;
+            color: var(--color-primary);
+            position: relative;
+            text-align: center;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+        }
+
+        /* Sección de versículos */
+        .verses-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+        }
+
+        .verses-section h3 {
+            color: var(--color-primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .verses-section ul {
+            list-style-position: inside;
+            padding-left: 1rem;
+        }
+
+        .verses-section li {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        /* Sección de imagen */
+        .image-section {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Formulario de petición */
+        .prayer-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--color-secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background-color: var(--color-secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 168, 255, 0.3);
+        }
+
+        /* Sección de donaciones */
+        .donation-section {
+            text-align: center;
+            padding: 3rem 10%;
+            background-color: white;
+            margin-top: 3rem;
+        }
+
+        .donation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .donation-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            transition: var(--transition);
+            min-width: 200px;
+        }
+
+        .donation-button.paypal {
+            background-color: #003087;
+        }
+
+        .donation-button.nequi {
+            background-color: #8241e0;
+        }
+
+        .donation-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .donation-button img {
+            height: 30px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            padding: 2rem 10%;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+            
+            .logo {
+                font-size: 2em;
+            }
+            
+            .tagline {
+                font-size: 1.2em;
+            }
+            
+            section {
+                padding: 3rem 5%;
+            }
+            
+            .nav-menu {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .donation-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con efecto parallax -->
+    <header id="sticky-parallax-header">
+        <div class="header-content">
+            <h1 class="logo">Orando por ti</h1>
+            <p class="tagline">Cree en el Señor Jesús y serás salvo, tú y tu familia</p>
+        </div>
+        
+        <!-- Navbar que aparece después del scroll -->
+        <nav class="navbar">
+            <ul class="nav-menu">
+                <li><a href="#versiculos" class="nav-link">Versículos</a></li>
+                <li><a href="#oracion" class="nav-link">Petición de Oración</a></li>
+                <li><a href="#donaciones" class="nav-link">Donaciones</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Sección de imagen -->
+        <section class="image-section">
+            <img src="orando.jpeg" alt="Jesús orando">
+        </section>
+
+        <!-- Sección de versículos -->
+        <section id="versiculos">
+            <div class="verses-section">
+                <h3>Versículos Bíblicos</h3>
+                <ul>
+                    <li>"Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree no se pierda, mas tenga vida eterna." - Juan 3:16</li>
+                    <li>"Clama a mí, y yo te responderé, y te enseñaré cosas grandes y ocultas que tú no conoces." - Jeremías 33:3</li>
+                    <li>"No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia." - Isaías 41:10</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Sección de petición de oración -->
+        <section id="oracion">
+            <h2 class="section-title">Petición de Oración</h2>
+            <div class="prayer-form">
+                <p style="text-align: center; margin-bottom: 2rem;">Envía tu petición y estaremos orando por ti.</p>
+                <form action="https://formspree.io/f/xovjwawl" method="POST">
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Tu nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Correo electrónico:</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Tu correo electrónico" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prayer">Petición:</label>
+                        <textarea id="prayer" name="prayer" class="form-control" placeholder="Escribe tu petición aquí..." rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensaje adicional (opcional):</label>
+                        <textarea id="message" name="Message" class="form-control" placeholder="Escribe un mensaje adicional aquí..." rows="3"></textarea>
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn">Enviar Petición</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Sección de donaciones -->
+        <section id="donaciones" class="donation-section">
+            <h2 class="section-title">Apoya nuestro ministerio</h2>
+            <p>Si deseas apoyar nuestro trabajo, puedes hacer una donación a través de:</p>
+            <div class="donation-buttons">
+                <a href="https://paypal.me/jhonf54?country.x=CO&locale.x=es_XC" target="_blank" class="donation-button paypal">
+                    <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal">
+                    PayPal
+                </a>
+                <a href="https://api.whatsapp.com/send?phone=573185190645&text=Hola,%20quiero%20hacer%20una%20donación%20a%20través%20de%20Nequi." target="_blank" class="donation-button nequi">
+                    <img src="nequi.png" alt="Nequi">
+                    Nequi
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Orando por ti. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // Mostrar navbar después del scroll
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('sticky-parallax-header');
+            const navbar = document.querySelector('.navbar');
+            const scrollPosition = window.scrollY;
+            
+            // Mostrar navbar cuando el header se haya reducido
+            if (scrollPosition > window.innerHeight * 0.7) {
+                navbar.classList.add('active');
+            } else {
+                navbar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling para enlaces
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
